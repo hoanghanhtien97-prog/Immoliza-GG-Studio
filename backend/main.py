@@ -18,6 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # --- Data Models ---
 
 class PropertyData(BaseModel):
@@ -41,52 +42,53 @@ class PropertyData(BaseModel):
     swimming_pool: bool
     state_of_the_building: str
 
+
 # --- Mappings ---
 
 kitchen_scale = {
-    'Not equipped': 0,
-    'Partially equipped': 1,
-    'Super equipped': 2,
-    'Fully equipped': 3
+    "Not equipped": 0,
+    "Partially equipped": 1,
+    "Super equipped": 2,
+    "Fully equipped": 3,
 }
 
 building_scale = {
-    'New': 4,
-    'Under construction': 4,
-    'Fully renovated': 3,
-    'Excellent': 3,
-    'Normal': 2,
-    'To be renovated': 1,
-    'To renovate': 1,
-    'To restore': 1,
-    'To demolish': 0
+    "New": 4,
+    "Under construction": 4,
+    "Fully renovated": 3,
+    "Excellent": 3,
+    "Normal": 2,
+    "To be renovated": 1,
+    "To renovate": 1,
+    "To restore": 1,
+    "To demolish": 0,
 }
+
 
 # --- Model Loading ---
 
 # Placeholder for your trained model
-# MODEL_PATH = "model.pkl"
-# if os.path.exists(MODEL_PATH):
-#     model = joblib.load(MODEL_PATH)
-# else:
-#     model = None
+MODEL_PATH = "model.pkl"
+if os.path.exists(MODEL_PATH):
+    model = joblib.load(MODEL_PATH)
+else:
+    model = None
+
 
 @app.get("/")
 async def root():
     return {"message": "BelgiImmo Real Estate Prediction API is running"}
+
 
 @app.get("/stats")
 async def get_stats():
     """
     Get comprehensive market statistics for the dashboard.
     """
+
     # In a real application, these would be computed from the dataset
     return {
-        "summary": {
-            "avg_price": 345000,
-            "transactions": 128000,
-            "regions_tracked": 3
-        },
+        "summary": {"avg_price": 345000, "transactions": 128000, "regions_tracked": 3},
         "top_expensive": {
             "total": [
                 {"name": "Knokke-Heist", "price": "€845,000"},
@@ -101,7 +103,7 @@ async def get_stats():
                 {"name": "Brussels City", "price": "€4,400/m²"},
                 {"name": "Etterbeek", "price": "€4,350/m²"},
                 {"name": "Knokke-Heist", "price": "€4,200/m²"},
-            ]
+            ],
         },
         "top_affordable": {
             "total": [
@@ -117,7 +119,7 @@ async def get_stats():
                 {"name": "Frameries", "price": "€1,180/m²"},
                 {"name": "Dour", "price": "€1,220/m²"},
                 {"name": "Charleroi", "price": "€1,250/m²"},
-            ]
+            ],
         },
         "regional_comparison": [
             {"name": "Brussels", "house": 485000, "apartment": 312000, "avgM2": 3200},
@@ -150,46 +152,55 @@ async def get_stats():
                 {"name": "Mid-Range (300k-600k)", "value": 35, "color": "#9CA3AF"},
                 {"name": "Premium (600k-1.2M)", "value": 8, "color": "#4B5563"},
                 {"name": "Luxury (>1.2M)", "value": 2, "color": "#1F2937"},
-            ]
+            ],
         },
-        "currency": "EUR"
+        "currency": "EUR",
     }
+
 
 @app.post("/predict")
 async def predict(data: PropertyData):
     """
     Predict the price of a property based on its features.
     """
+
+    print(f"Received data for prediction: {data}")
     try:
         # Convert Pydantic model to dictionary
         input_dict = data.dict()
-        
+
         # Apply categorical mappings
-        input_dict['fully_equipped_kitchen'] = kitchen_scale.get(data.fully_equipped_kitchen, 0)
-        input_dict['state_of_the_building'] = building_scale.get(data.state_of_the_building, 2)
-        
+        input_dict["fully_equipped_kitchen"] = kitchen_scale.get(
+            data.fully_equipped_kitchen, 0
+        )
+        input_dict["state_of_the_building"] = building_scale.get(
+            data.state_of_the_building, 2
+        )
+
         # Convert to DataFrame (standard format for most ML models)
         df = pd.DataFrame([input_dict])
-        
+
         # Perform prediction
         # if model:
         #     prediction = model.predict(df)[0]
         # else:
         #     # Mock prediction logic if model is not loaded
         #     prediction = 250000.0 + (data.living_area * 2500)
-        
+
         # Mock result for demonstration
-        prediction = 325000.0
-        
+        prediction = 100.0
+
         return {
             "status": "success",
             "prediction": round(float(prediction), 2),
-            "currency": "EUR"
+            "currency": "EUR",
         }
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

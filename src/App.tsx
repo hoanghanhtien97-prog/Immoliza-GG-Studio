@@ -129,7 +129,7 @@ const Navbar = () => (
         Belgi<span className="text-belgi-gold">Immo</span>
       </span>
       <div className="hidden lg:block h-8 w-px bg-white/10 mx-2" />
-      <span className="hidden lg:block text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 max-w-[120px] leading-tight">
+      <span className="hidden lg:block text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 max-w-30 leading-tight">
         Belgium Real Estate Intelligence
       </span>
     </div>
